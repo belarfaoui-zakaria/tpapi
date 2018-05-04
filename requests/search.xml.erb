@@ -1,0 +1,61 @@
+
+
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+   <soapenv:Header/>
+   <soapenv:Body>
+
+<LowFareSearchReq xmlns="http://www.travelport.com/schema/air_v42_0" TraceId="marokkoeksperten" TargetBranch="<%= @target  %>" ReturnUpsellFare="true">
+  <BillingPointOfSaleInfo xmlns="http://www.travelport.com/schema/common_v42_0" OriginApplication="F8C867BC-Sandbox" />
+
+
+	<% @legs.each do |leg| %>
+	  <SearchAirLeg>
+	    <SearchOrigin>
+	      <CityOrAirport xmlns="http://www.travelport.com/schema/common_v42_0" Code="<%= leg[:from] %>" PreferCity="true" />
+	    </SearchOrigin>
+	    <SearchDestination>
+	      <CityOrAirport xmlns="http://www.travelport.com/schema/common_v42_0" Code="<%= leg[:to] %>" PreferCity="true" />
+	    </SearchDestination>
+	    <SearchDepTime PreferredTime="<%= leg[:at].strftime('%Y-%m-%d') %>" />
+
+        <AirLegModifiers>
+          <PreferredCabins>
+            <CabinClass xmlns="http://www.travelport.com/schema/common_v42_0" Type="Economy" />
+          </PreferredCabins>
+        </AirLegModifiers>
+
+	  </SearchAirLeg>
+	<% end %>
+
+  <AirSearchModifiers>
+    <PreferredProviders>
+      <Provider xmlns="http://www.travelport.com/schema/common_v42_0" Code="1G" />
+    </PreferredProviders>
+    <FlightType MaxStops="1" />
+  </AirSearchModifiers>
+
+	<% @options[:passengers].each do |passenger|%>
+        <% if(passenger[:code] == "ADT") then %>
+		  <SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="<%= passenger[:code] %>" />
+        <% else %>
+            <SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="<%= passenger[:code] %>" Age="<% passenger[:age] %>" />
+        <% end %>
+	<% end %>
+	<!-- <SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="CNN" Age="2" DOB="2016-04-15" /> -->
+
+
+
+ 
+
+      <AirPricingModifiers FaresIndicator="PublicFaresOnly" CurrencyType="eur">
+        <AccountCodes>
+          <AccountCode xmlns="http://www.travelport.com/schema/common_v42_0" Code="-" />
+        </AccountCodes>
+      </AirPricingModifiers>
+
+
+
+</LowFareSearchReq>
+
+   </soapenv:Body>
+</soapenv:Envelope>
